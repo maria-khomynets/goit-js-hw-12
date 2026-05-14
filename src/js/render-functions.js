@@ -1,73 +1,95 @@
+// Описаний у документації
 import SimpleLightbox from 'simplelightbox';
+// Додатковий імпорт стилів
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
-let lightbox = null;
+// Описаний у документації
+import iziToast from 'izitoast';
+// Додатковий імпорт стилів
+import 'izitoast/dist/css/iziToast.min.css';
+
+const galleryList = document.querySelector('.gallery');
+const loader = document.querySelector('.loader');
+export const loadMoreBtn = document.querySelector('.btn-load-more');
+const SLBInstance = new SimpleLightbox('.gallery-link', {
+  captionsData: 'alt',
+});
 
 export function createGallery(images) {
-  const gallery = document.querySelector('.gallery');
-
-  const markup = images
-    .map(
-      image => `
-      <li class="gallery-item">
-        <a href="${image.largeImageURL}">
-          <img
-            class="gallery-image"
-            src="${image.webformatURL}"
-            alt="${image.tags}"
-          />
-        </a>
-
-        <ul class="item-indicators">
-          <li>
-            <h2>Likes</h2>
-            <p>${image.likes}</p>
-          </li>
-          <li>
-            <h2>Views</h2>
-            <p>${image.views}</p>
-          </li>
-          <li>
-            <h2>Comments</h2>
-            <p>${image.comments}</p>
-          </li>
-          <li>
-            <h2>Downloads</h2>
-            <p>${image.downloads}</p>
-          </li>
-        </ul>
-      </li>
-    `
-    )
-    .join('');
-
-  gallery.insertAdjacentHTML('beforeend', markup);
-
-  if (!lightbox) {
-    lightbox = new SimpleLightbox('.gallery-item a', {
-      captionsData: 'alt',
-      captionPosition: 'bottom',
-    });
-  }
-
-  lightbox.refresh();
+  galleryList.insertAdjacentHTML(
+    'beforeend',
+    images
+      .map(
+        ({
+          webformatURL: preview,
+          largeImageURL: origin,
+          tags,
+          likes,
+          views,
+          comments,
+          downloads,
+        }) => {
+          return `<li class="gallery-item">
+          <a href="${origin}" class="gallery-link">
+              <img src='${preview}' alt='${tags}' />
+              <div class="img-desc-container">
+                <div class="img-desc-wrapper">
+                    <p class="img-desc-titles">Likes</p>
+                    <p>${likes}</p>
+                </div>
+                <div class="img-desc-wrapper">
+                    <p class="img-desc-titles">Views</p>
+                    <p>${views}</p>
+                </div>
+                <div class="img-desc-wrapper">
+                    <p class="img-desc-titles">Comments</p>
+                    <p>${comments}</p>
+                </div>
+                <div class="img-desc-wrapper">
+                    <p class="img-desc-titles">Downloads</p>
+                    <p>${downloads}</p>
+                </div>
+              </div>
+              </a>
+          </li>`;
+        }
+      )
+      .join('')
+  );
+  SLBInstance.refresh();
 }
-
 export function clearGallery() {
-  const gallery = document.querySelector('.gallery');
-  gallery.innerHTML = '';
+  galleryList.innerHTML = '';
 }
-
 export function showLoader() {
-  const loaderWrapper = document.querySelector('.loader-wrapper');
-  if (loaderWrapper) {
-    loaderWrapper.classList.add('loader-wrapper-show');
-  }
+  loader.classList.add('is-open');
+}
+export function hideLoader() {
+  loader.classList.remove('is-open');
+}
+export function showError(message) {
+  iziToast.show({
+    message,
+    backgroundColor: 'red',
+    messageColor: 'white',
+    maxWidth: 432,
+    iconUrl: './img/error-icon.svg',
+    position: 'bottomRight',
+  });
+}
+export function showMessage(message) {
+  iziToast.show({
+    message,
+    backgroundColor: 'lightblue',
+    messageColor: 'white',
+    position: 'bottomRight',
+  });
 }
 
-export function hideLoader() {
-  const loaderWrapper = document.querySelector('.loader-wrapper');
-  if (loaderWrapper) {
-    loaderWrapper.classList.remove('loader-wrapper-show');
-  }
+export function showLoadMoreButton() {
+  loadMoreBtn.classList.add('is-visible');
+}
+
+export function hideLoadMoreButton() {
+  loadMoreBtn.classList.remove('is-visible');
 }
